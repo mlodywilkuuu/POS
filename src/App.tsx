@@ -53,6 +53,7 @@ export default function App() {
     <main className="main-area">
       <header className="topbar"><div className="breadcrumb">Sprzedaż <span>/</span> <strong>{activeNav}</strong></div><div className="top-actions"><div className="live-pill"><i/> System aktywny</div><button className="icon-button" aria-label="Powiadomienia"><Bell size={18}/><i className="notification-dot"/></button><div className="top-divider"/><div className="top-date">Środa, 5 listopada 2026</div><div className="top-avatar">MW</div></div></header>
       <div className="page-content">
+        {activeNav === 'Punkt sprzedaży' ? <>
         <div className="page-heading"><div><div className="eyebrow">STREFA SPRZEDAŻY</div><h1>Punkt sprzedaży <span className="heading-spark">✳</span></h1><p>Zarządzaj sprzedażą i obsługuj klientów w jednym miejscu.</p></div><div className="heading-actions"><button className="secondary-button"><ScanLine size={16}/> Skanuj produkt</button><button className="primary-button" onClick={() => {setCart([]);setPaid(false)}}><Plus size={16}/> Nowa transakcja</button></div></div>
         <div className="stats-row">
           <div className="stat-card"><div className="stat-top"><span>Dzisiejsza sprzedaż</span><span className="stat-icon purple"><Banknote size={17}/></span></div><div className="stat-value">8 420,00 zł</div><div className="stat-foot"><span className="positive">↗ 12,8%</span><span>vs. poprzedni dzień</span></div></div>
@@ -82,6 +83,41 @@ export default function App() {
             {paid && <div className="success-toast"><Check size={16}/> Transakcja demonstracyjna zakończona!</div>}
           </aside>
         </div>
+        </> : <section className="catalog-panel" style={{minHeight: '65vh', padding: 28}}>
+          <div className="panel-heading">
+            <div>
+              <div className="eyebrow">NOVA POS · PANEL</div>
+              <h2 style={{fontSize: 26, marginTop: 8}}>{activeNav}</h2>
+              <p>{({
+                'Przegląd': 'Podsumowanie najważniejszych informacji o sklepie.',
+                'Produkty': 'Katalog produktów dostępnych w demonstracyjnej bazie.',
+                'Zamówienia': 'Lista zamówień i ich bieżący status.',
+                'Klienci': 'Zarządzanie bazą klientów sklepu.',
+                'Analityka': 'Podstawowe wskaźniki sprzedaży.',
+                'Ustawienia': 'Konfiguracja i informacje o środowisku NovaPOS.'
+              } as Record<string, string>)[activeNav] || 'Panel NovaPOS'}</p>
+            </div>
+          </div>
+          {activeNav === 'Produkty' ? <div className="product-grid" style={{marginTop: 24}}>
+            {products.map(product => <div className="product-card" key={product.id}>
+              <div className={`product-art ${product.tone}`}><span>{product.symbol}</span></div>
+              <div className="product-info"><span className="product-category">{product.category}</span><strong>{product.name}</strong><small>SKU: {product.sku}</small><div className="product-price">{money(product.price)}</div></div>
+            </div>)}
+          </div> : <div className="stats-row" style={{marginTop: 24}}>
+            {(activeNav === 'Przegląd' ? [['Dzisiejsza sprzedaż','8 420,00 zł'],['Transakcje','38'],['Średnia wartość koszyka','221,58 zł']] :
+              activeNav === 'Zamówienia' ? [['Wszystkie zamówienia','12'],['Oczekujące','4'],['Zrealizowane dziś','8']] :
+              activeNav === 'Klienci' ? [['Wszyscy klienci','128'],['Nowi w tym miesiącu','16'],['Klienci lojalnościowi','42']] :
+              activeNav === 'Analityka' ? [['Przychód dziś','8 420,00 zł'],['Liczba transakcji','38'],['Średni koszyk','221,58 zł']] :
+              [['Wersja aplikacji','0.1.0'],['Tryb pracy','Demonstracyjny'],['Status','Aktywny']]
+            ).map(([label, value]) => <div className="stat-card" key={label}><div className="stat-top"><span>{label}</span></div><div className="stat-value">{value}</div></div>)}
+          </div>}
+          <p style={{marginTop: 28, color: 'var(--muted, #718096)', lineHeight: 1.6}}>
+            {activeNav === 'Ustawienia'
+              ? 'To wersja demonstracyjna. Ustawienia i dane są lokalnym przykładem — nie są jeszcze zapisywane na serwerze.'
+              : 'Widok demonstracyjny NovaPOS. Dane są przykładowe; po podłączeniu backendu będzie można zarządzać nimi na stałe.'}
+          </p>
+          <button className="primary-button" style={{marginTop: 16}} onClick={() => setActiveNav('Punkt sprzedaży')}>Przejdź do punktu sprzedaży</button>
+        </section>}
         <footer className="page-footer"><span>© 2026 NovaPOS. Wszystkie prawa zastrzeżone.</span><span><i/> Wersja 0.1.0 · Środowisko deweloperskie</span></footer>
       </div>
     </main>
