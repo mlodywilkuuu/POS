@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { Search, Plus, Minus, Trash2, ShoppingBag, LayoutDashboard, Package, ClipboardList, Users, BarChart3, Settings, Bell, ChevronDown, ScanLine, CreditCard, Banknote, Percent, X, Check, Printer, Coffee, Tag, RotateCcw, Wallet, Smartphone, Clock3 } from 'lucide-react'
 import { categories, products, type Product } from './data/products'
 
@@ -36,7 +36,7 @@ export default function App() {
   function change(id: string, delta: number) {
     setCart(current => current.map(line => line.product.id === id ? { ...line, qty: line.qty + delta } : line).filter(line => line.qty > 0))
   }
-  function scan(event: React.FormEvent<HTMLFormElement>) {
+  function scan(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const value = barcode.trim().toLowerCase()
     if (!value) return
