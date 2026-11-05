@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type FormEvent } from 'react'
-import { Search, Plus, Minus, Trash2, ShoppingBag, LayoutDashboard, Package, ClipboardList, Users, BarChart3, Settings, Bell, ChevronDown, ScanLine, CreditCard, Banknote, Percent, X, Check, Printer, Coffee, Tag, RotateCcw, Wallet, Smartphone, Clock3 } from 'lucide-react'
+import { Search, Plus, Minus, Trash2, ShoppingBag, LayoutDashboard, Package, ClipboardList, Users, BarChart3, Settings, Bell, ChevronDown, ScanLine, CreditCard, Banknote, X, Check, Printer, Coffee, Tag, RotateCcw, Smartphone, Clock3 } from 'lucide-react'
 import { categories, products, type Product } from './data/products'
 
 type CartLine = { product: Product; qty: number }
