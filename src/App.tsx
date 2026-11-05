@@ -40,7 +40,7 @@ export default function App() {
     { label: 'Produkty', icon: Package },
     { label: 'Zamówienia', icon: ClipboardList },
     { label: 'Klienci', icon: Users },
-    { label: 'Analityka', icon: ChartNoAxesCombined },
+    { label: 'Analityka', icon: BarChart3 },
   ]
   return <div className="app-shell">
     <aside className="sidebar">
