@@ -3,5 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/POS/',
+  // Relative paths work on GitHub Pages project sites and local previews.
+  base: './',
 })
