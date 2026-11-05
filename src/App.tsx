@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { FormEvent } from 'react'
 import {
   Search, ScanBarcode, Plus, Minus, Trash2, ShoppingCart, Package,
   ClipboardList, BarChart3, Settings, CreditCard, Banknote, Smartphone,
-  X, Check, Pencil, Save, AlertTriangle, Store, ChevronDown, Boxes,
+  X, Pencil, Save, AlertTriangle, Store, ChevronDown, Boxes,
   Receipt, CircleHelp, LogOut
 } from 'lucide-react'
 
@@ -127,7 +128,7 @@ export default function App() {
     setForm({ name: product.name, barcode: product.barcode, category: product.category, price: String(product.price), stock: String(product.stock), unit: product.unit })
     setEditorOpen(true)
   }
-  function saveProduct(event: React.FormEvent<HTMLFormElement>) {
+  function saveProduct(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const price = Number(form.price.replace(',', '.'))
     const stock = Number(form.stock)
