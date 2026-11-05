@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Search, Plus, Minus, Trash2, ShoppingBag, LayoutDashboard, Package, ClipboardList, Users, ChartNoAxesCombined, Settings, Bell, ChevronDown, ScanLine, CreditCard, Banknote, Percent, X, Check, ArrowUpRight, Command } from 'lucide-react'
+import { Search, Plus, Minus, Trash2, ShoppingBag, LayoutDashboard, Package, ClipboardList, Users, BarChart3, Settings, Bell, ChevronDown, ScanLine, CreditCard, Banknote, Percent, X, Check, ArrowUpRight } from 'lucide-react'
 import { categories, products, type Product } from './data/products'
 
 type CartLine = { product: Product; qty: number }
