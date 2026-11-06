@@ -1,27 +1,26 @@
-# NovaPOS
+# The Paper Studio
 
-Universal Point of Sale platform with a dark, premium interface.
+Panel redakcyjny do tworzenia i porządkowania artykułów.
 
-## Stack
-- React + TypeScript + Vite
-- Node.js + Express (API — planned)
-- PostgreSQL + Prisma (data layer — planned)
+## Funkcje
+- Lista artykułów z wyszukiwaniem i filtrowaniem po statusie
+- Edytor treści z formatowaniem, nagłówkami, cytatami i listami
+- Lead, autor, kategoria, tagi i opis SEO
+- Podgląd artykułu przed publikacją
+- Statusy: szkic, do akceptacji, zaplanowany i opublikowany
+- Biblioteka mediów oparta na adresach zdjęć
 
-## Development
+## Technologie
+- React
+- TypeScript
+- Vite
+- lucide-react
+
+## Uruchomienie lokalne
 ```bash
 npm install
 npm run dev
 ```
 
-## Project status
-Early development. The current app is a frontend prototype with demo data; it is not ready for real payments or production use.
-
-## Roadmap
-- [x] POS workspace UI
-- [x] Product catalog, category filter, search and cart
-- [x] Discounts and demo checkout
-- [ ] API and database
-- [ ] Authentication, roles and permissions
-- [ ] Inventory and stock movements
-- [ ] Orders, refunds and receipts
-- [ ] Reporting and multi-store support
+## Ważne
+To działający prototyp frontendowy. Artykuły zapisują się w localStorage przeglądarki, więc są dostępne tylko w tej przeglądarce i na tym urządzeniu. Nie ma jeszcze serwera, bazy danych, kont redaktorów ani rzeczywistej publikacji na zewnętrznej stronie.
