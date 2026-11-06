@@ -1,4 +1,4 @@
-name: Deploy NovaPOS to GitHub Pages
+name: Deploy The Paper Studio to GitHub Pages
 
 on:
   push:
