@@ -7,7 +7,7 @@ const read=():Article[]=>{try{const x=localStorage.getItem('thepaper-articles');
 const stamp=(v:string)=>new Date(v).toLocaleString('pl-PL',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
 const wordCount=(s:string)=>s.replace(/<[^>]*>/g,' ').trim().split(/\s+/).filter(Boolean).length
 export default function App(){
-const [articles,setArticles]=useState<Article[]>(read),[view,setView]=useState<'Artykuły'|'Media'|'Ustawienia'>('Artykuły'),[filter,setFilter]=useState('Wszystkie'),[search,setSearch]=useState(''),[editing,setEditing]=useState(false),[preview,setPreview]=useState(false),[notice,setNotice]=useState('')
+const [articles,setArticles]=useState<Article[]>(read),[darkMode,setDarkMode]=useState(()=>localStorage.getItem('thepaper-dark-mode')==='true'),[view,setView]=useState<'Artykuły'|'Media'|'Ustawienia'>('Artykuły'),[filter,setFilter]=useState('Wszystkie'),[search,setSearch]=useState(''),[editing,setEditing]=useState(false),[preview,setPreview]=useState(false),[notice,setNotice]=useState('')
 const blank:Article={id:'',title:'',lead:'',body:'<p></p>',category:'Aktualności',author:'Redakcja',status:'Szkic',updated:'',image:'',tags:'',seo:''}
 const [form,setForm]=useState<Article>(blank),bodyRef=useRef<HTMLDivElement>(null)
 useEffect(()=>{localStorage.setItem('thepaper-articles',JSON.stringify(articles))},[articles])
