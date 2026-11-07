@@ -3,7 +3,7 @@ import AdvancedRepublic from './AdvancedRepublic';
 import StateManagement from './StateManagement';
 import AdditionalSystems from './AdditionalSystems';
 import TradeMarket from './TradeMarket';
-import { Activity, ArrowRight, BarChart3, BookOpen, Building2, Check, ChevronDown, ChevronRight, CircleDollarSign, FileText, Flag, Gavel, Landmark, LayoutDashboard, Menu, Moon, Plus, RotateCcw, Save, Search, Settings, Shield, Sun, Trash2, Users, Vote, X, Scale } from 'lucide-react';
+import { Activity, ArrowRight, BarChart3, BookOpen, Building2, Check, ChevronDown, ChevronRight, CircleDollarSign, FileText, Flag, Gavel, Globe2, Landmark, LayoutDashboard, Menu, Moon, Plus, RotateCcw, Save, Search, Settings, Shield, Sun, Trash2, Users, Vote, X, Scale } from 'lucide-react';
 
 type Party = {id:string;name:string;short:string;color:string;leader:string;support:number;seats:number;ideology:string};
 type Candidate = {id:string;name:string;partyId:string;support:number;bio:string};
