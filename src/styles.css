@@ -18,3 +18,32 @@
 .app.dark .election-tabs button{background:#1a2940;color:#b9c7db}
 .app.dark .institution-grid>div,.app.dark .region-card,.app.dark .advanced-article{background:#1a2940;border-color:#34445c}
 .app.dark .footer{color:#8392a8}
+
+/* Expanded state systems and collapsible navigation */
+.extra-menu{display:flex;flex-direction:column;gap:10px}
+.extra-group{background:var(--surface);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.extra-trigger{width:100%;display:flex;align-items:center;gap:13px;padding:17px 19px;text-align:left;background:transparent;color:var(--text);border:0;cursor:pointer}
+.extra-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:10px;background:var(--blue2);color:#5d82c2;flex-shrink:0}
+.extra-heading{display:flex;flex-direction:column;gap:4px;flex:1}
+.extra-heading b{font:700 12px Manrope}
+.extra-heading small{font-size:9px;color:var(--muted)}
+.extra-chevron{transition:transform .2s;color:var(--muted)}
+.extra-group.expanded .extra-chevron{transform:rotate(180deg)}
+.extra-body{padding:0 19px 19px;border-top:1px solid var(--line)}
+.extra-body>p{margin:14px 0}
+.extra-form{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.extra-form label,.extra-range{display:flex;flex-direction:column;gap:8px;font-size:11px;font-weight:700;flex:1;min-width:210px}
+.extra-form select{min-width:220px}
+.extra-range{margin:15px 0}
+.extra-range input{width:100%;accent-color:#5d82c2}
+.extra-stat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px;margin-top:14px;background:var(--surface2);border-radius:9px}
+.extra-stat b{font:800 15px Manrope}
+.extra-stat span{font-size:9px;color:var(--muted);margin-right:10px}
+.idea-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:15px}
+.idea-row{display:flex;align-items:flex-start;gap:10px;padding:11px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
+.idea-row span{font:800 10px Manrope;color:#6d8dc8}
+.idea-row b{font-size:10px;line-height:1.5;font-weight:600}
+.dark .extra-group{background:#172337;border-color:#2b3a50}
+.dark .extra-trigger{color:#edf2fb}
+.dark .extra-stat,.dark .idea-row{background:#101b2c;border-color:#34445c}
+@media(max-width:650px){.idea-grid{grid-template-columns:1fr}.extra-trigger{padding:14px}.extra-heading small{line-height:1.4}.extra-body{padding:0 14px 14px}.extra-form{align-items:stretch;flex-direction:column}.extra-form>*{width:100%}}
