@@ -10,7 +10,7 @@ import { Activity, ArrowRight, BarChart3, BookOpen, Building2, Check, ChevronDow
 type Party = {id:string;name:string;short:string;color:string;leader:string;support:number;seats:number;ideology:string};
 type Candidate = {id:string;name:string;partyId:string;support:number;bio:string};
 type Article = {id:string;title:string;body:string};
-type Bill = {id:string;title:string;summary:string;sponsor:string;status:string;articles:Article[];votes?:{yes:number;no:number;abstain:number};created:string};
+type Bill = {id:string;title:string;summary:string;sponsor:string;status:string;articles:Article[];votes?:{yes:number;no:number;abstain:number};created:string;aiGenerated?:boolean};
 type Log = {id:string;date:string;text:string;kind:string};
 type State = {campaignStatus?:string;lastAutoElection?:string;presidentialCampaignStatus?:string;lastAutoPresElection?:string;presidentialRunoffDate?:string;year:number;term:number;president:string;primeMinister:string;playerName:string;playerRole:string;playerParty:string;playerPartyId:string;governmentFormed:boolean;gameDate:string;parties:Party[];candidates:Candidate[];bills:Bill[];logs:Log[];budget:number;approval:number;inflation:number;unemployment:number;debt:number;electionType:string;dark:boolean};
 const initial:State={campaignStatus:'Poza kampanią',lastAutoElection:'',presidentialCampaignStatus:'Poza kampanią',lastAutoPresElection:'',presidentialRunoffDate:'',year:2026,term:1,president:'Aleksandra Nowak',primeMinister:'Marek Zieliński',playerName:'Gracz',playerRole:'Osoba niezrzeszona',playerParty:'Brak',playerPartyId:'',governmentFormed:false,gameDate:'2026-02-18',budget:820,approval:54,inflation:3.8,unemployment:5.1,debt:58.2,electionType:'prezydenckie',
