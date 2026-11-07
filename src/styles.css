@@ -47,3 +47,31 @@
 .dark .extra-trigger{color:#edf2fb}
 .dark .extra-stat,.dark .idea-row{background:#101b2c;border-color:#34445c}
 @media(max-width:650px){.idea-grid{grid-template-columns:1fr}.extra-trigger{padding:14px}.extra-heading small{line-height:1.4}.extra-body{padding:0 14px 14px}.extra-form{align-items:stretch;flex-direction:column}.extra-form>*{width:100%}}
+
+/* Foreign trade market */
+.trade-suite{display:flex;flex-direction:column;gap:16px}
+.trade-mark{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;background:var(--surface2);color:var(--accent)}
+.trade-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.trade-metric{padding:16px;border:1px solid var(--line);background:var(--surface);border-radius:11px;display:flex;flex-direction:column;gap:8px}
+.trade-metric span{font-size:10px;color:var(--muted)}
+.trade-metric b{font:800 19px Manrope}
+.trade-metric .positive{color:#269b69}.trade-metric .negative{color:#d45b5b}
+.trade-controls{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end}
+.trade-controls label{display:flex;flex-direction:column;gap:8px;font-size:11px;font-weight:700}
+.trade-controls select{min-width:0;width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--text)}
+.trade-tariff input{width:100%;accent-color:#5d82c2}
+.trade-agreements{font-size:10px;color:var(--muted);padding-top:12px;border-top:1px solid var(--line)}
+.trade-tabs{display:flex;gap:8px;margin:14px 0}
+.trade-tabs button{display:flex;align-items:center;gap:7px;padding:9px 15px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--text);cursor:pointer;font-size:11px}
+.trade-tabs button.active{background:var(--blue2);border-color:#7898cc;color:var(--text);font-weight:800}
+.trade-list{display:flex;flex-direction:column}
+.trade-row{display:grid;grid-template-columns:minmax(160px,1fr) 120px 90px auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid var(--line)}
+.trade-good{display:flex;flex-direction:column;gap:4px}.trade-good b{font-size:11px}.trade-good small,.trade-price small{font-size:9px;color:var(--muted)}
+.trade-price{display:flex;flex-direction:column;gap:3px}.trade-price b{font:800 14px Manrope}
+.trade-qty{display:flex;flex-direction:column;gap:4px;font-size:9px;color:var(--muted)}
+.trade-qty input{width:100%;min-width:0;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--surface2);color:var(--text)}
+.trade-action{white-space:nowrap;padding:9px 12px}
+.trade-tips{font-size:11px;line-height:1.9;color:var(--muted);padding-left:20px}
+.dark .trade-metric{background:#172337;border-color:#2b3a50}
+.dark .trade-controls select,.dark .trade-qty input{background:#101b2c;color:#edf2fb;border-color:#34445c}
+@media(max-width:760px){.trade-controls{grid-template-columns:1fr}.trade-row{grid-template-columns:minmax(0,1fr) 95px 70px}.trade-action{grid-column:1/-1}.trade-summary{grid-template-columns:1fr}.trade-metric{padding:12px;flex-direction:row;align-items:center;justify-content:space-between}.trade-metric b{font-size:16px}}
