@@ -41,7 +41,7 @@ function App(){
   const campaignDate=new Date(electionDate+'T12:00:00');campaignDate.setDate(campaignDate.getDate()-30);const campaignStart=campaignDate.toISOString().slice(0,10);
   const presYear=year<2028?2028:2028+Math.max(0,Math.ceil((year-2028)/5))*5;const presDate=presYear+'-05-20';const presCampaignDate=new Date(presDate+'T12:00:00');presCampaignDate.setDate(presCampaignDate.getDate()-30);const presCampaignStart=presCampaignDate.toISOString().slice(0,10);
   let campaignStatus=s.campaignStatus||'Poza kampanią';let presidentialCampaignStatus=s.presidentialCampaignStatus||'Poza kampanią';let presidentialRunoffDate=s.presidentialRunoffDate||'';let lastAutoPresElection=s.lastAutoPresElection||'';
-  let parties=s.parties;let candidates=s.candidates;let governmentFormed=s.governmentFormed;let president=s.president;let logs=s.logs;let approval=s.approval;let lastAutoElection=s.lastAutoElection||'';
+  let parties=s.parties;let candidates=s.candidates;let bills=s.bills;let governmentFormed=s.governmentFormed;let president=s.president;let logs=s.logs;let approval=s.approval;let lastAutoElection=s.lastAutoElection||'';
   if(nextDate===campaignStart){campaignStatus='Kampania wyborcza';logs=[{id:id(),date:nextDate,text:'Rozpoczęła się kampania parlamentarna. Partie walczą o poparcie wyborców.',kind:'election'},...logs].slice(0,100);}
   if(nextDate===presCampaignStart){presidentialCampaignStatus='Kampania prezydencka';logs=[{id:id(),date:nextDate,text:'Rozpoczęła się kampania prezydencka. Kandydaci prowadzą debaty i spotkania z wyborcami.',kind:'election'},...logs].slice(0,100);}
   if(campaignStatus==='Kampania wyborcza'&&monthChanged){parties=parties.map(p=>({...p,support:Math.max(1,Math.min(60,p.support+(Math.random()-.48)*1.2+(approval-50)*0.015))}));}
@@ -55,7 +55,61 @@ function App(){
    else{const runoff=new Date(presDate+'T12:00:00');runoff.setDate(runoff.getDate()+14);presidentialRunoffDate=runoff.toISOString().slice(0,10);logs=[{id:id(),date:nextDate,text:'Wybory prezydenckie: brak większości bezwzględnej. Do II tury przechodzą '+(results[0]?.name||'—')+' i '+(results[1]?.name||'—')+'. II tura: '+presidentialRunoffDate+'.',kind:'election'},...logs].slice(0,100);}
   }
   if(presidentialRunoffDate&&nextDate===presidentialRunoffDate){const top=[...candidates].sort((a,b)=>b.support-a.support).slice(0,2);if(top.length){const winner=top[Math.floor(Math.random()*Math.min(2,top.length))];president=winner.name;logs=[{id:id(),date:nextDate,text:'II tura wyborów prezydenckich: '+winner.name+' zwycięża i obejmuje urząd Prezydenta RP.',kind:'election'},...logs].slice(0,100);}presidentialRunoffDate='';presidentialCampaignStatus='Po wyborach';}
-  return {...s,gameDate:nextDate,year,term:year>=2026?Math.floor((year-2026)/4)+1:1,campaignStatus,presidentialCampaignStatus,presidentialRunoffDate,lastAutoPresElection,lastAutoElection,president,parties,candidates,governmentFormed,approval:monthChanged?Math.max(5,Math.min(95,approval+(Math.random()-.52)*2)):approval,inflation:monthChanged?Math.max(0.5,Math.min(20,s.inflation+(Math.random()-.48)*0.12+((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.012)-((Number(localStorage.getItem('rep-tax-v2')||19)-19)*0.008))):s.inflation,unemployment:monthChanged?Math.max(2,Math.min(20,s.unemployment+(Math.random()-.5)*0.08-((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.008))):s.unemployment,budget:monthChanged?Math.max(0,s.budget+((Number(localStorage.getItem('rep-tax-v2')||19)-19)*0.15)-((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.2)-((Number(localStorage.getItem('rep-education-v2')||5)+Number(localStorage.getItem('rep-research-v2')||2)-7)*0.1)):s.budget,debt:monthChanged?Math.max(10,s.debt+0.03+((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.01)):s.debt,logs:monthChanged&&nextDate!==electionDate?[{id:id(),date:nextDate,text:'Minął kolejny miesiąc. Gospodarka i poparcie zaktualizowały się.',kind:'system'},...logs].slice(0,100):logs};
+  // Autonomiczne życie polityczne: partie prowadzą kampanię, składają projekty i walczą o poparcie.
+  if(monthChanged){
+   const proposals=[
+    {keys:['liberal','wolno','centrum'],items:[['Ustawa o uproszczeniu działalności gospodarczej','Ograniczenie zbędnych formalności i skrócenie procedur administracyjnych.','Przedsiębiorcy i obywatele zyskują prostsze procedury.'],['Ustawa o stabilnych finansach publicznych','Wprowadzenie wieloletnich ram wydatkowych i przeglądu ulg podatkowych.','Zwiększenie przejrzystości i przewidywalności finansów państwa.']]},
+    {keys:['konserw','narod','tradyc'],items:[['Ustawa o bezpieczeństwie granic','Wzmocnienie ochrony granic i koordynacji służb.','Poprawa bezpieczeństwa i sprawności służb państwowych.'],['Ustawa o wsparciu rodzin','Rozszerzenie instrumentów wsparcia rodzin i opieki nad dziećmi.','Wzmocnienie stabilności ekonomicznej gospodarstw domowych.']]},
+    {keys:['lewic','socjal'],items:[['Ustawa o dostępności ochrony zdrowia','Skrócenie kolejek i zwiększenie dostępności świadczeń publicznych.','Poprawa dostępu do podstawowych usług medycznych.'],['Ustawa o prawach pracowniczych','Wzmocnienie ochrony zatrudnionych i dialogu społecznego.','Podniesienie standardów zatrudnienia i bezpieczeństwa pracy.']]},
+    {keys:['agrar','ludow','roln'],items:[['Ustawa o stabilizacji dochodów rolniczych','Mechanizmy stabilizujące dochody gospodarstw rolnych.','Ograniczenie ryzyka dochodowego w rolnictwie.'],['Ustawa o rozwoju obszarów wiejskich','Wsparcie lokalnej infrastruktury i usług na terenach wiejskich.','Zmniejszenie różnic rozwojowych między regionami.']]},
+    {keys:['zielon','eko','klimat'],items:[['Ustawa o czystej energii','Ułatwienia dla odnawialnych źródeł energii i modernizacji sieci.','Przyspieszenie transformacji energetycznej.'],['Ustawa o ochronie zasobów naturalnych','Program ochrony wód, powietrza i bioróżnorodności.','Ograniczenie presji na środowisko naturalne.']]}
+   ];
+   const pick=(arr:any[])=>arr[Math.floor(Math.random()*arr.length)];
+   const aiParties=[...parties].sort(()=>Math.random()-.5).slice(0,Math.random()<.35?2:1);
+   aiParties.forEach(p=>{
+    const ideology=p.ideology.toLowerCase();const group=proposals.find(g=>g.keys.some(k=>ideology.includes(k)))||{items:[['Ustawa o rozwoju regionalnym','Program inwestycji i poprawy jakości usług publicznych w regionach.','Wyrównanie szans rozwojowych i poprawa jakości życia.']]};
+    const [title,summary,article]=pick(group.items);
+    if(!bills.some(b=>b.title===title&&b.sponsor===p.name&&b.status!=='Odrzucona przez Sejm')){
+     bills=[{id:id(),title,summary,sponsor:p.name,status:'Projekt',created:nextDate,articles:[{id:id(),title:'Art. 1. Cel ustawy',body:article},{id:id(),title:'Art. 2. Wykonanie',body:'Właściwi ministrowie określą szczegółowy sposób realizacji ustawy w drodze przepisów wykonawczych.'}],aiGenerated:true},...bills];
+     logs=[{id:id(),date:nextDate,text:p.name+' samodzielnie złożyła projekt ustawy: „'+title+'”.',kind:'law'},...logs].slice(0,100);
+    }
+   });
+   // Sondaże reagują na ocenę rządu, aktywność partii i nastroje społeczne.
+   parties=parties.map(p=>({...p,support:Math.max(1,Math.min(60,Number((p.support+(Math.random()-.5)*1.1+(approval-50)*.018+(p.id===s.playerPartyId?.12:0)).toFixed(1))))}));
+   if(Math.random()<.22){
+    const events=[
+     {name:'Protest przeciwko kosztom życia',impact:-2.2,desc:'W kilku miastach odbyły się demonstracje dotyczące cen i kosztów utrzymania.'},
+     {name:'Udana inicjatywa społeczna',impact:1.4,desc:'Obywatelska inicjatywa zdobyła szerokie poparcie i poprawiła nastroje.'},
+     {name:'Spór w koalicji',impact:-1.5,desc:'Różnice programowe między ugrupowaniami wywołały publiczny konflikt.'},
+     {name:'Afera w administracji',impact:-2.8,desc:'Media ujawniły nieprawidłowości w jednej z instytucji publicznych.'},
+     {name:'Porozumienie ponad podziałami',impact:1.8,desc:'Partie uzgodniły wspólne stanowisko w ważnej sprawie państwowej.'}
+    ];
+    const e=pick(events);approval=Math.max(5,Math.min(95,approval+e.impact));
+    logs=[{id:id(),date:nextDate,text:e.name+'. '+e.desc,kind:'politics'},...logs].slice(0,100);
+   }
+   // Projekty AI przechodzą kolejne etapy, a następnie są rozstrzygane.
+   bills=bills.map(b=>{
+    if(!(b as any).aiGenerated)return b;
+    if(b.status==='Projekt')return {...b,status:'I czytanie'};
+    if(b.status==='I czytanie')return {...b,status:'W komisji'};
+    if(b.status==='W komisji')return {...b,status:'II czytanie'};
+    if(b.status==='II czytanie')return {...b,status:'III czytanie'};
+    if(b.status==='III czytanie'){
+     const sponsor=parties.find(p=>p.name===b.sponsor);
+     const chance=Math.max(.12,Math.min(.88,.42+(approval-50)*.008+((sponsor?.support||10)-15)*.006));
+     const passed=Math.random()<chance;
+     logs=[{id:id(),date:nextDate,text:'Głosowanie nad projektem AI „'+b.title+'”: '+(passed?'projekt został uchwalony.':'projekt został odrzucony.') ,kind:'vote'},...logs].slice(0,100);
+     return {...b,status:passed?'Uchwalona przez Sejm':'Odrzucona przez Sejm',votes:{yes:passed?Math.round(230+Math.random()*90):Math.round(100+Math.random()*120),no:passed?Math.round(230-Math.random()*90):Math.round(240+Math.random()*100),abstain:0}};
+    }
+    return b;
+   });
+   // Co pewien czas partia rozlicza lidera z wyników.
+   if(year!==new Date((s.gameDate||'2026-02-18')+'T12:00:00').getFullYear()&&Math.random()<.25){
+    const weak=parties.filter(p=>p.support<7);
+    if(weak.length){const p=pick(weak);const names=['Marta Lewandowska','Adam Nowicki','Krzysztof Malinowski','Joanna Kamińska','Paweł Domański'];const leader=pick(names);parties=parties.map(x=>x.id===p.id?{...x,leader}:x);logs=[{id:id(),date:nextDate,text:p.name+' zmieniła lidera po wewnętrznym kryzysie. Nowy lider: '+leader+'.',kind:'politics'},...logs].slice(0,100);}
+   }
+  }
+  return {...s,gameDate:nextDate,year,term:year>=2026?Math.floor((year-2026)/4)+1:1,campaignStatus,presidentialCampaignStatus,presidentialRunoffDate,lastAutoPresElection,lastAutoElection,president,parties,candidates,bills,governmentFormed,approval:monthChanged?Math.max(5,Math.min(95,approval+(Math.random()-.52)*2)):approval,inflation:monthChanged?Math.max(0.5,Math.min(20,s.inflation+(Math.random()-.48)*0.12+((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.012)-((Number(localStorage.getItem('rep-tax-v2')||19)-19)*0.008))):s.inflation,unemployment:monthChanged?Math.max(2,Math.min(20,s.unemployment+(Math.random()-.5)*0.08-((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.008))):s.unemployment,budget:monthChanged?Math.max(0,s.budget+((Number(localStorage.getItem('rep-tax-v2')||19)-19)*0.15)-((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.2)-((Number(localStorage.getItem('rep-education-v2')||5)+Number(localStorage.getItem('rep-research-v2')||2)-7)*0.1)):s.budget,debt:monthChanged?Math.max(10,s.debt+0.03+((Number(localStorage.getItem('rep-spending-v2')||35)-35)*0.01)):s.debt,logs:monthChanged&&nextDate!==electionDate?[{id:id(),date:nextDate,text:'Minął kolejny miesiąc. Gospodarka i poparcie zaktualizowały się.',kind:'system'},...logs].slice(0,100):logs};
  }),10000);return()=>window.clearInterval(timer)},[]);
  useEffect(()=>{if(!notice)return;const t=setTimeout(()=>setNotice(''),3200);return()=>clearTimeout(t)},[notice]);
  const totalSeats=state.parties.reduce((a,p)=>a+p.seats,0);
