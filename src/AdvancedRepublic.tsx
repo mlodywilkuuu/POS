@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BadgeCheck, BookOpen, Building2, CalendarDays, CheckCircle2, ClipboardList, FilePenLine, Landmark, Megaphone, Scale, ShieldCheck, Vote } from 'lucide-react';
+import { Building2, CalendarDays, FilePenLine, Megaphone, ShieldCheck } from 'lucide-react';
 
 type Party = { id: string; name: string; short: string; color: string; leader: string; support: number; seats: number; ideology: string };
 type Candidate = { id: string; name: string; partyId: string; support: number; bio: string };
