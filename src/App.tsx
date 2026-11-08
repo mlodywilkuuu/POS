@@ -3,7 +3,6 @@ import { Search, MapPin, RefreshCw, CloudSun, Sun, Cloud, CloudRain, CloudSnow, 
 
 type Place = { name: string; admin1?: string; latitude: number; longitude: number; country?: string };
 type Forecast = { current?: any; daily?: any; daily_units?: any; hourly?: any; timezone?: string; current_units?: any };
-type Seasonal = { monthly?: any; monthly_units?: any };
 const DEFAULT_PLACE: Place = { name: 'Warszawa', admin1: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, country: 'Polska' };
 const weatherText = (code: number) => code === 0 ? 'Bezchmurnie' : code <= 2 ? 'Małe zachmurzenie' : code === 3 ? 'Pochmurno' : code <= 48 ? 'Mgła' : code <= 57 ? 'Mżawka' : code <= 67 ? 'Deszcz' : code <= 77 ? 'Śnieg' : code <= 82 ? 'Przelotne opady' : code <= 86 ? 'Opady śniegu' : 'Burza';
 const WeatherIcon = ({ code, size = 22 }: { code: number; size?: number }) => {
@@ -53,15 +52,7 @@ export default function App() {
       const f = await fetch(base + '?' + params.toString()).then(r => { if (!r.ok) throw new Error('Nie udało się pobrać prognozy.'); return r.json(); });
       const airData = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?' + new URLSearchParams({ latitude: String(target.latitude), longitude: String(target.longitude), current: 'european_aqi,pm2_5,pm10,uv_index', timezone: 'auto' }).toString()).then(r => r.ok ? r.json() : null).catch(() => null);
       setAir(airData?.current || null);
-      /* const [f, s] = await Promise.all([
-        fetch(base + '?' + params.toString()).then(r => { if (!r.ok) throw new Error('Nie udało się pobrać prognozy.'); return r.json(); }),
-        fetch('https://seasonal-api.open-meteo.com/v1/seasonal?' + new URLSearchParams({
-          latitude: String(target.latitude), longitude: String(target.longitude),
-          monthly: 'temperature_2m_mean,temperature_2m_mean_anomaly,precipitation_sum,precipitation_sum_anomaly',
-          forecast_days: '120', timezone: 'auto', models: 'ecmwf_seasonal_ensemble_mean_seamless'
-        }).toString()).then(r => r.ok ? r.json() : null).catch(() => null)
-      ]);
-      */
+
       setForecast(f);
       setUpdated(new Date());
     } catch (e) {
@@ -266,7 +257,7 @@ export default function App() {
 
     {tab !== 'month' && <section className="glass hourly-card" id="hourly"><div className="section-head"><div><span className="eyebrow">SZCZEGÓŁOWO</span><h2>Najbliższe godziny</h2></div><span className="subtle-label">Prognoza godzinowa</span></div><div className="hourly-scroll">{hourRows.map((h:any,i:number)=><div className="hour-item" key={h.time+i}><span>{i===0?'Teraz':h.time}</span><WeatherIcon code={h.code} size={22}/><b>{fmt(h.temp)}°</b><small><Droplets size={12}/>{pct(h.rain)}</small></div>)}</div></section>}
 
-    <section className="glass tools-card notification-card"><div><b>Powiadomienia o ostrzeżeniach</b><span>Włącz powiadomienia przeglądarki. Gdy otworzysz stronę i wykryje aktywne ostrzeżenie, pokażemy komunikat.</span></div><button className="tool-button" onClick={enableNotifications}>{notificationsEnabled ? 'Powiadomienia włączone' : 'Włącz powiadomienia'}</button></section>
+    <section className="glass tools-card notification-card"><div><b>Powiadomienia o ostrzeżeniach</b><span>Włącz powiadomienia przeglądarki i wyświetl aktualne ostrzeżenie. Strona musi być otwarta, aby działała.</span></div><button className="tool-button" onClick={enableNotifications}>{notificationsEnabled ? 'Powiadomienia włączone' : 'Włącz powiadomienia'}</button></section>
 
     <footer><div className="footer-brand"><CloudSun size={18}/> PogodaPL</div><span>Dane pogodowe: Open-Meteo · Modele numeryczne ECMWF</span><span>Prognozy mają charakter probabilistyczny i mogą się zmieniać.</span></footer>
   </main>;
