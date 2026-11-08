@@ -214,6 +214,11 @@ export default function App() {
     {activeSection === "alerts" && <section className="glass alerts-card" id="alerts">
       <div className="section-head"><div><span className="eyebrow">OFICJALNE KOMUNIKATY</span><h2><AlertTriangle size={19}/> Ostrzeżenia IMGW</h2></div><a className="source-link" href="https://meteo.imgw.pl/" target="_blank" rel="noreferrer">Mapa ostrzeżeń IMGW ↗</a></div>
       <p className="alerts-intro">Aktywne ostrzeżenia meteorologiczne publikowane dla obszarów Polski. Sprawdź na mapie IMGW, czy obejmują Twój powiat.</p>
+      <div className="imgw-map-wrap">
+        <div className="imgw-map-heading"><b>Mapa ostrzeżeń meteorologicznych IMGW</b><span>Oficjalna, interaktywna mapa z zaznaczonymi obszarami powiatów</span></div>
+        <iframe title="Oficjalna mapa ostrzeżeń meteorologicznych IMGW" src="https://meteo.imgw.pl/dyn/index.html#osmet=true&oshyd=false&pronieb=false&roadwarn=false&pnzh=false" loading="lazy" referrerPolicy="no-referrer" allowFullScreen />
+        <a href="https://meteo.imgw.pl/dyn/index.html#osmet=true&oshyd=false&pronieb=false&roadwarn=false&pnzh=false" target="_blank" rel="noreferrer">Otwórz mapę IMGW w nowej karcie ↗</a>
+      </div>
       {warningsLoading ? <div className="empty-state">Pobieram oficjalne ostrzeżenia…</div> :
         warningsError ? <div className="empty-state">{warningsError} <a href="https://meteo.imgw.pl/" target="_blank" rel="noreferrer">Otwórz IMGW</a></div> :
         warnings.length === 0 ? <div className="no-alerts"><span className="live-dot"/> Brak aktywnych ostrzeżeń meteorologicznych w pobranym wykazie IMGW.</div> :
