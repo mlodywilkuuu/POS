@@ -176,7 +176,7 @@ export default function App() {
   const saveFavorites = (next: Place[]) => { setFavorites(next); localStorage.setItem('pogodapl-favorites', JSON.stringify(next)); };
   const toggleFavorite = () => saveFavorites(favorites.some(p => p.latitude === place.latitude && p.longitude === place.longitude) ? favorites.filter(p => p.latitude !== place.latitude || p.longitude !== place.longitude) : [...favorites, place].slice(-8));
   const enableNotifications = async () => { if (!('Notification' in window)) return; const permission = await Notification.requestPermission(); setNotificationsEnabled(permission === 'granted'); if (permission === 'granted' && warnings.length) new Notification('PogodaPL – ostrzeżenia IMGW', { body: warnings[0].nazwa_zdarzenia || 'Aktywne ostrzeżenie pogodowe. Sprawdź mapę IMGW.' }); };
-  const goTo = (id: string) => { setActiveSection(id); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  const goTo = (id: string) => setActiveSection(id);
   const mapLayers = [{id:'rain',label:'Deszcz'}, {id:'snowAccu',label:'Śnieg'}, {id:'ptype',label:'Typ opadu'}, {id:'radar',label:'Radar'}, {id:'wind',label:'Wiatr'}, {id:'temp',label:'Temperatura'}, {id:'clouds',label:'Chmury'}];
 
   return <main className="app-shell">
@@ -211,7 +211,7 @@ export default function App() {
 
     <section className="location-line"><div><span className="live-dot"/><span>DANE METEOROLOGICZNE NA ŻYWO</span><span className="muted">/</span><MapPin size={14}/><b>{place.name}{place.admin1 ? ', ' + place.admin1 : ''}</b></div><span className="updated">Aktualizacja: {updated ? updated.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit'}) : '—'} · automatycznie co 15 min</span></section>
 
-    <section className="glass alerts-card" id="alerts">
+    {activeSection === "alerts" && <section className="glass alerts-card" id="alerts">
       <div className="section-head"><div><span className="eyebrow">OFICJALNE KOMUNIKATY</span><h2><AlertTriangle size={19}/> Ostrzeżenia IMGW</h2></div><a className="source-link" href="https://meteo.imgw.pl/" target="_blank" rel="noreferrer">Mapa ostrzeżeń IMGW ↗</a></div>
       <p className="alerts-intro">Aktywne ostrzeżenia meteorologiczne publikowane dla obszarów Polski. Sprawdź na mapie IMGW, czy obejmują Twój powiat.</p>
       {warningsLoading ? <div className="empty-state">Pobieram oficjalne ostrzeżenia…</div> :
@@ -222,18 +222,18 @@ export default function App() {
           <div className="alert-content"><b>{w.nazwa_zdarzenia || 'Ostrzeżenie meteorologiczne'}</b><p>{w.tresc || 'Szczegóły dostępne w komunikacie IMGW.'}</p><small>Obowiązuje: {w.obowiazuje_od || '—'} – {w.obowiazuje_do || '—'}{w.prawdopodobienstwo ? ' · Prawdopodobieństwo: ' + w.prawdopodobienstwo + '%' : ''}</small></div>
         </article>)}</div>}
       <div className="source-note">Źródło: IMGW-PIB · aktualizacja automatyczna co 10 minut · lista ogólnopolska, nie zastępuje sprawdzenia obszaru na mapie IMGW.</div>
-    </section>
+    </section>}
 
-    <section className="glass radar-card" id="radar">
+    {activeSection === "radar" && <section className="glass radar-card" id="radar">
       <div className="section-head"><div><span className="eyebrow">INTERAKTYWNA MAPA</span><h2>Mapa pogody – deszcz, śnieg i więcej</h2></div><span className="subtle-label">Centrum: {place.name}</span></div>
       <div className="map-layer-tabs" role="tablist" aria-label="Warstwy mapy">{mapLayers.map(layer=><button key={layer.id} role="tab" aria-selected={mapLayer===layer.id} className={mapLayer===layer.id?'active':''} onClick={()=>setMapLayer(layer.id)}>{layer.label}</button>)}</div>
       <div className="radar-frame"><iframe key={mapLayer + place.latitude + place.longitude} title={'Mapa pogody – ' + mapLayers.find(x=>x.id===mapLayer)?.label + ' dla ' + place.name} src={'https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=%C2%B0C&metricWind=default&zoom=6&overlay=' + mapLayer + '&product=ecmwf&level=surface&lat=' + place.latitude + '&lon=' + place.longitude + '&detailLat=' + place.latitude + '&detailLon=' + place.longitude + '&message=true'} loading="lazy" referrerPolicy="no-referrer" allowFullScreen /></div>
       <div className="source-note">Wybierz warstwę, aby zobaczyć prognozowany deszcz, śnieg, rodzaj opadu (w tym deszcz ze śniegiem), radar, wiatr, temperaturę lub zachmurzenie. Mapa Windy prezentuje prognozy modelowe; radar pokazuje obserwowane odbicia i może mieć ograniczony zasięg.</div>
-    </section>
+    </section>}
 
     {error && <div className="error-banner"><AlertTriangle size={17}/>{error} <button onClick={refresh}>Spróbuj ponownie</button></div>}
 
-    <section className="glass tools-card" id="favorites"><div className="section-head"><div><span className="eyebrow">SZYBKI DOSTĘP</span><h2>Ulubione miejscowości</h2></div><button className="tool-button" onClick={toggleFavorite}>{favorites.some(p => p.latitude === place.latitude && p.longitude === place.longitude) ? 'Usuń z ulubionych' : 'Dodaj ' + place.name}</button></div><div className="favorite-list">{favorites.length ? favorites.map((p,i)=><button key={p.latitude + '-' + p.longitude + i} onClick={() => selectPlace(p)}><MapPin size={14}/>{p.name}{p.admin1 ? ', ' + p.admin1 : ''}</button>) : <span className="source-note">Dodaj aktualną miejscowość, aby szybko wracać do jej prognozy.</span>}</div></section>
+    {activeSection === "favorites" && <section className="glass tools-card" id="favorites"><div className="section-head"><div><span className="eyebrow">SZYBKI DOSTĘP</span><h2>Ulubione miejscowości</h2></div><button className="tool-button" onClick={toggleFavorite}>{favorites.some(p => p.latitude === place.latitude && p.longitude === place.longitude) ? 'Usuń z ulubionych' : 'Dodaj ' + place.name}</button></div><div className="favorite-list">{favorites.length ? favorites.map((p,i)=><button key={p.latitude + '-' + p.longitude + i} onClick={() => selectPlace(p)}><MapPin size={14}/>{p.name}{p.admin1 ? ', ' + p.admin1 : ''}</button>) : <span className="source-note">Dodaj aktualną miejscowość, aby szybko wracać do jej prognozy.</span>}</div></section>
 
     <section className="hero-grid">
       <div className="glass hero-card">
@@ -262,7 +262,18 @@ export default function App() {
 
     <section className="glass hourly-card" id="hourly"><div className="section-head"><div><span className="eyebrow">SZCZEGÓŁOWO</span><h2>Najbliższe godziny</h2></div><span className="subtle-label">Prognoza godzinowa</span></div><div className="hourly-scroll">{hourRows.map((h:any,i:number)=><div className="hour-item" key={h.time+i}><span>{i===0?'Teraz':h.time}</span><WeatherIcon code={h.code} size={22}/><b>{fmt(h.temp)}°</b><small><Droplets size={12}/>{pct(h.rain)}</small></div>)}</div></section>
 
-    <section className="glass tools-card notification-card"><div><b>Powiadomienia o ostrzeżeniach</b><span>Włącz powiadomienia przeglądarki i wyświetl aktualne ostrzeżenie. Strona musi być otwarta, aby działała.</span></div><button className="tool-button" onClick={enableNotifications}>{notificationsEnabled ? 'Powiadomienia włączone' : 'Włącz powiadomienia'}</button></section>
+    <section className="glass tools-card notification-card"><div><b>Powiadomienia o ostrzeżeniach</b><span>Włącz powiadomienia przeglądarki i wyświetl aktualne ostrzeżenie. Strona musi być otwarta, aby działała.</span></div><button className="tool-button" onClick={enableNotifications}>{notificationsEnabled ? 'Powiadomienia włączone' : 'Włącz powiadomienia'}</button></section></>}
+
+    {activeSection === "air" && <section className="glass tools-card air-page" id="air">
+      <div className="section-head"><div><span className="eyebrow">JAKOŚĆ POWIETRZA</span><h2>Powietrze i indeks UV</h2></div></div>
+      <div className="metric-grid">
+        <div className="glass metric"><div className="metric-label"><Wind/> EUROPEJSKI AQI</div><strong>{air?.european_aqi ?? '—'}</strong><span>Indeks jakości powietrza</span></div>
+        <div className="glass metric"><div className="metric-label"><Droplets/> PM2.5</div><strong>{air?.pm2_5 == null ? '—' : fmt(air.pm2_5)}<small> µg/m³</small></strong><span>Pył drobny</span></div>
+        <div className="glass metric"><div className="metric-label"><Wind/> PM10</div><strong>{air?.pm10 == null ? '—' : fmt(air.pm10)}<small> µg/m³</small></strong><span>Pył zawieszony</span></div>
+        <div className="glass metric"><div className="metric-label"><Sun/> INDEKS UV</div><strong>{air?.uv_index == null ? '—' : fmt(air.uv_index)}</strong><span>{air?.uv_index >= 8 ? 'Bardzo wysoki – chroń skórę' : air?.uv_index >= 6 ? 'Wysoki – zalecana ochrona' : air?.uv_index >= 3 ? 'Umiarkowany' : 'Niski'}</span></div>
+      </div>
+      <p className="source-note">Dane Open-Meteo. AQI i stężenia pyłów opisują jakość powietrza, a UV – natężenie promieniowania ultrafioletowego.</p>
+    </section>}
 
     <footer><div className="footer-brand"><CloudSun size={18}/> PogodaPL</div><span>Dane pogodowe: Open-Meteo · Modele numeryczne ECMWF</span><span>Prognozy mają charakter probabilistyczny i mogą się zmieniać.</span></footer>
   </main>;
