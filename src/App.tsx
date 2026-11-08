@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, MapPin, RefreshCw, CloudSun, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets, Sparkles, CalendarDays, ThermometerSun, Sunrise, Sunset, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Search, MapPin, RefreshCw, CloudSun, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets, Gauge, Sparkles, CalendarDays, ThermometerSun, Sunrise, Sunset, AlertTriangle, ChevronDown } from 'lucide-react';
 
 type Place = { name: string; admin1?: string; latitude: number; longitude: number; country?: string };
 type Forecast = { current?: any; daily?: any; daily_units?: any; hourly?: any; timezone?: string; current_units?: any };
