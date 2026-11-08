@@ -25,6 +25,8 @@ export default function App() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [tab, setTab] = useState<'7' | '14'>('7');
+  const [mapLayer, setMapLayer] = useState('rain');
+  const [activeSection, setActiveSection] = useState('forecast');
   const [favorites, setFavorites] = useState<Place[]>(() => { try { return JSON.parse(localStorage.getItem('pogodapl-favorites') || '[]'); } catch { return []; } });
   const [air, setAir] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(typeof Notification !== 'undefined' && Notification.permission === 'granted');
@@ -174,7 +176,8 @@ export default function App() {
   const saveFavorites = (next: Place[]) => { setFavorites(next); localStorage.setItem('pogodapl-favorites', JSON.stringify(next)); };
   const toggleFavorite = () => saveFavorites(favorites.some(p => p.latitude === place.latitude && p.longitude === place.longitude) ? favorites.filter(p => p.latitude !== place.latitude || p.longitude !== place.longitude) : [...favorites, place].slice(-8));
   const enableNotifications = async () => { if (!('Notification' in window)) return; const permission = await Notification.requestPermission(); setNotificationsEnabled(permission === 'granted'); if (permission === 'granted' && warnings.length) new Notification('PogodaPL – ostrzeżenia IMGW', { body: warnings[0].nazwa_zdarzenia || 'Aktywne ostrzeżenie pogodowe. Sprawdź mapę IMGW.' }); };
-  const goTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const goTo = (id: string) => { setActiveSection(id); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  const mapLayers = [{id:'rain',label:'Deszcz'}, {id:'snowAccu',label:'Śnieg'}, {id:'ptype',label:'Typ opadu'}, {id:'radar',label:'Radar'}, {id:'wind',label:'Wiatr'}, {id:'temp',label:'Temperatura'}, {id:'clouds',label:'Chmury'}];
 
   return <main className="app-shell">
     <div className="ambient ambient-one" /><div className="ambient ambient-two" />
@@ -204,7 +207,7 @@ export default function App() {
       </div>
       <button className="refresh-btn" onClick={refresh} aria-label="Odśwież dane"><RefreshCw size={17} className={refreshing ? 'spin' : ''}/><span>Odśwież</span></button>
     </header>
-    <nav className="menu-bar" aria-label="Menu główne"><label className="menu-select-label">Przejdź do <select defaultValue="forecast" onChange={e => goTo(e.target.value)}><option value="forecast">Prognoza</option><option value="alerts">Ostrzeżenia IMGW</option><option value="radar">Radar opadów</option><option value="air">Jakość powietrza i UV</option><option value="hourly">Prognoza godzinowa</option></select></label><button onClick={() => goTo('forecast')}>Prognoza</button><button onClick={() => goTo('alerts')}>Ostrzeżenia</button><button onClick={() => goTo('radar')}>Radar</button><button onClick={() => goTo('air')}>Powietrze / UV</button><button onClick={() => goTo('favorites')}>Ulubione</button></nav>
+    <nav className="menu-bar tab-bar" aria-label="Zakładki główne"><button className={activeSection==='forecast'?'active':''} onClick={() => goTo('forecast')}>Prognoza</button><button className={activeSection==='alerts'?'active':''} onClick={() => goTo('alerts')}>Ostrzeżenia</button><button className={activeSection==='radar'?'active':''} onClick={() => goTo('radar')}>Mapa pogody</button><button className={activeSection==='air'?'active':''} onClick={() => goTo('air')}>Powietrze i UV</button><button className={activeSection==='favorites'?'active':''} onClick={() => goTo('favorites')}>Ulubione</button></nav>
 
     <section className="location-line"><div><span className="live-dot"/><span>DANE METEOROLOGICZNE NA ŻYWO</span><span className="muted">/</span><MapPin size={14}/><b>{place.name}{place.admin1 ? ', ' + place.admin1 : ''}</b></div><span className="updated">Aktualizacja: {updated ? updated.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit'}) : '—'} · automatycznie co 15 min</span></section>
 
@@ -222,9 +225,10 @@ export default function App() {
     </section>
 
     <section className="glass radar-card" id="radar">
-      <div className="section-head"><div><span className="eyebrow">OBRAZ OPADÓW</span><h2>Radar opadów</h2></div><span className="subtle-label">Centrum: {place.name}</span></div>
-      <div className="radar-frame"><iframe title={'Radar opadów dla ' + place.name} src={'https://www.rainviewer.com/map.html?loc=' + place.latitude + ',' + place.longitude + ',6&layer=radar&sm=1&sn=1&hu=0'} loading="lazy" referrerPolicy="no-referrer" allowFullScreen /></div>
-      <div className="source-note">Radar pokazuje dostępne obrazy historyczne opadów; nie jest prognozą, a zasięg i aktualność zależą od dostawcy danych. Źródło: RainViewer.</div>
+      <div className="section-head"><div><span className="eyebrow">INTERAKTYWNA MAPA</span><h2>Mapa pogody – deszcz, śnieg i więcej</h2></div><span className="subtle-label">Centrum: {place.name}</span></div>
+      <div className="map-layer-tabs" role="tablist" aria-label="Warstwy mapy">{mapLayers.map(layer=><button key={layer.id} role="tab" aria-selected={mapLayer===layer.id} className={mapLayer===layer.id?'active':''} onClick={()=>setMapLayer(layer.id)}>{layer.label}</button>)}</div>
+      <div className="radar-frame"><iframe key={mapLayer + place.latitude + place.longitude} title={'Mapa pogody – ' + mapLayers.find(x=>x.id===mapLayer)?.label + ' dla ' + place.name} src={'https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=%C2%B0C&metricWind=default&zoom=6&overlay=' + mapLayer + '&product=ecmwf&level=surface&lat=' + place.latitude + '&lon=' + place.longitude + '&detailLat=' + place.latitude + '&detailLon=' + place.longitude + '&message=true'} loading="lazy" referrerPolicy="no-referrer" allowFullScreen /></div>
+      <div className="source-note">Wybierz warstwę, aby zobaczyć prognozowany deszcz, śnieg, rodzaj opadu (w tym deszcz ze śniegiem), radar, wiatr, temperaturę lub zachmurzenie. Mapa Windy prezentuje prognozy modelowe; radar pokazuje obserwowane odbicia i może mieć ograniczony zasięg.</div>
     </section>
 
     {error && <div className="error-banner"><AlertTriangle size={17}/>{error} <button onClick={refresh}>Spróbuj ponownie</button></div>}
