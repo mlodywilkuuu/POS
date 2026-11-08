@@ -281,6 +281,14 @@ export default function App() {
       </div>
     </section>
 
+
+    <section className="glass chart-card">
+      <div className="section-head"><div><span className="eyebrow">NAJBLIŻSZE GODZINY</span><h2>Temperatura i opady</h2></div><span className="subtle-label">Prognoza godzinowa</span></div>
+      <div className="chart-legend"><span>Temperatura °C</span><span>Szansa opadu %</span></div>
+      <div className="temp-chart-bars">{hourRows.slice(0,12).map((h:any,i:number)=><div className="temp-chart-point" key={h.time+i}><b>{fmt(h.temp)}°</b><i style={{height:(Math.max(0,Math.min(100,((Number(h.temp)||0)+10)*2)))+'%'}}/><small>{h.time}</small><em>{fmt(h.rain)}%</em></div>)}</div>
+      <p className="source-note">Wysokość słupka obrazuje temperaturę w skali orientacyjnej; pod nią podano prawdopodobieństwo opadu.</p>
+    </section>
+
     <section className="glass ai-card"><div className="ai-icon"><Sparkles size={21}/></div><div className="ai-copy"><div className="ai-heading">PogodaAI <span>ANALIZA AUTOMATYCZNA</span></div><p>{loading ? 'AI analizuje najnowsze dane...' : ai}</p><small>Analiza regułowa na podstawie aktualnej prognozy. To wskazówka, nie ostrzeżenie IMGW.</small></div><div className="ai-pulse"><i/><i/><i/></div></section>
 
     <section className="glass forecast-card" id="forecast">
@@ -291,6 +299,40 @@ export default function App() {
     <section className="glass hourly-card" id="hourly"><div className="section-head"><div><span className="eyebrow">SZCZEGÓŁOWO</span><h2>Najbliższe godziny</h2></div><span className="subtle-label">Prognoza godzinowa</span></div><div className="hourly-scroll">{hourRows.map((h:any,i:number)=><div className="hour-item" key={h.time+i}><span>{i===0?'Teraz':h.time}</span><WeatherIcon code={h.code} size={22}/><b>{fmt(h.temp)}°</b><small><Droplets size={12}/>{pct(h.rain)}</small></div>)}</div></section>
 
     <section className="glass tools-card notification-card"><div><b>Powiadomienia o ostrzeżeniach</b><span>Włącz powiadomienia przeglądarki i wyświetl aktualne ostrzeżenie. Strona musi być otwarta, aby działała.</span></div><button className="tool-button" onClick={enableNotifications}>{notificationsEnabled ? 'Powiadomienia włączone' : 'Włącz powiadomienia'}</button></section></>}
+
+
+    {activeSection === "compare" && <section className="glass tools-card feature-page">
+      <div className="section-head"><div><span className="eyebrow">POLSKA W JEDNYM MIEJSCU</span><h2><Building2 size={19}/> Porównywarka miast</h2></div><span className="subtle-label">Dane na żywo</span></div>
+      {comparisonLoading ? <div className="empty-state">Pobieram pogodę dla pięciu miast…</div> : comparison.length ? <div className="comparison-grid">{comparison.map((row:any)=><article className="comparison-city" key={row.city.name}><div><b>{row.city.name}</b><small>{row.city.admin1}</small></div><WeatherIcon code={row.current.weather_code} size={27}/><strong>{fmt(row.current.temperature_2m)}°C</strong><span>Maks. {fmt(row.daily.temperature_2m_max?.[0])}° / min. {fmt(row.daily.temperature_2m_min?.[0])}°</span><small><Droplets size={13}/> Opady: {pct(row.daily.precipitation_probability_max?.[0])}</small><button onClick={()=>selectPlace(row.city)}>Zobacz prognozę</button></article>)}</div> : <div className="empty-state">Porównanie jest chwilowo niedostępne. Spróbuj ponownie później.</div>}
+      <p className="source-note">Warszawa, Kraków, Gdańsk, Białystok i Wrocław. Dane z Open-Meteo.</p>
+    </section>}
+
+    {activeSection === "weekend" && <section className="glass tools-card feature-page">
+      <div className="section-head"><div><span className="eyebrow">SOBOTA I NIEDZIELA</span><h2><CalendarDays size={19}/> Prognoza weekendowa – {place.name}</h2></div></div>
+      {daily?.time ? <div className="weekend-grid">{daily.time.map((date:string,i:number)=>({date,i,day:new Date(date+'T12:00:00').getDay()})).filter((x:any)=>x.day===6||x.day===0).slice(0,2).map((x:any)=><article className="weekend-day" key={x.date}><span>{x.day===6?'SOBOTA':'NIEDZIELA'} · {dayName(x.date)}</span><WeatherIcon code={daily.weather_code[x.i]} size={38}/><b>{weatherText(daily.weather_code[x.i])}</b><strong>{fmt(daily.temperature_2m_max?.[x.i])}° <small>/ {fmt(daily.temperature_2m_min?.[x.i])}°</small></strong><div><Droplets size={14}/> Szansa opadu: {pct(daily.precipitation_probability_max?.[x.i])}</div><div><Wind size={14}/> Wiatr: {fmt(daily.wind_speed_10m_max?.[x.i])} km/h</div><div className="weekend-rain">Suma opadów: {daily.precipitation_sum?.[x.i] == null ? '—' : Number(daily.precipitation_sum[x.i]).toFixed(1)+' mm'}</div></article>)}</div> : <div className="empty-state">Ładowanie prognozy weekendowej…</div>}
+      <p className="source-note">Najbliższa sobota i niedziela dostępna w prognozie.</p>
+    </section>}
+
+    {activeSection === "rain" && <section className="glass tools-card feature-page">
+      <div className="section-head"><div><span className="eyebrow">PROGNOZA GODZINOWA</span><h2><Umbrella size={19}/> Kiedy będzie padać? · {place.name}</h2></div></div>
+      {hourly?.time ? <div className="rain-timeline">{hourly.time.slice(0,48).map((time:string,i:number)=>({time,i,p:Number(hourly.precipitation_probability?.[i] ?? 0),amount:Number(hourly.precipitation?.[i] ?? 0)})).filter((x:any)=>x.p>=20||x.amount>0).slice(0,16).map((x:any)=><div className="rain-time" key={x.time}><b>{new Date(x.time).toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short'})}</b><strong>{new Date(x.time).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</strong><span>{x.p}% szansy</span><small>{x.amount.toFixed(1)} mm</small></div>)}
+        {hourly.time.slice(0,48).every((_:string,i:number)=>Number(hourly.precipitation_probability?.[i] ?? 0)<20&&Number(hourly.precipitation?.[i] ?? 0)===0) && <div className="no-alerts">W ciągu najbliższych 48 godzin nie widać istotnego sygnału opadów (próg 20%).</div>}
+      </div> : <div className="empty-state">Ładowanie danych opadowych…</div>}
+      <p className="source-note">Pokazujemy godziny z prawdopodobieństwem opadu co najmniej 20% lub prognozowaną ilością opadu większą od zera. Prognoza modelowa.</p>
+    </section>}
+
+    {activeSection === "sun" && <section className="glass tools-card feature-page">
+      <div className="section-head"><div><span className="eyebrow">RYTM DNIA</span><h2><Sun size={19}/> Słońce i astronomia · {place.name}</h2></div></div>
+      {daily?.time?.length ? <div className="sun-grid">
+        <article><Sunrise/><span>Wschód słońca</span><strong>{daily.sunrise?.[0]?.slice(11,16) || '—'}</strong></article>
+        <article><Sunset/><span>Zachód słońca</span><strong>{daily.sunset?.[0]?.slice(11,16) || '—'}</strong></article>
+        <article><Sun/><span>Długość dnia</span><strong>{daily.daylight_duration?.[0] == null ? '—' : (daily.daylight_duration[0]/3600).toFixed(1)+' godz.'}</strong></article>
+        <article><CloudSun/><span>Usłonecznienie</span><strong>{daily.sunshine_duration?.[0] == null ? '—' : (daily.sunshine_duration[0]/3600).toFixed(1)+' godz.'}</strong></article>
+        <article><Sun/><span>Maksymalny indeks UV</span><strong>{daily.uv_index_max?.[0] == null ? '—' : fmt(daily.uv_index_max[0])}</strong></article>
+        <article><Moon/><span>Faza Księżyca</span><strong>{moonPhase(new Date())}</strong></article>
+      </div> : <div className="empty-state">Ładowanie danych astronomicznych…</div>}
+      <p className="source-note">Wschód, zachód, długość dnia, usłonecznienie i UV z Open-Meteo. Faza Księżyca jest przybliżonym wyliczeniem astronomicznym.</p>
+    </section>}
 
     {activeSection === "air" && <section className="glass tools-card air-page" id="air">
       <div className="section-head"><div><span className="eyebrow">JAKOŚĆ POWIETRZA</span><h2>Powietrze i indeks UV</h2></div></div>
