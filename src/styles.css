@@ -65,3 +65,48 @@ section[id]{scroll-margin-top:82px}
 .imgw-map-wrap>a{display:block;padding:11px 15px;color:#91ceff;font-size:11px;text-decoration:none;border-top:1px solid #8fcaff20}
 .imgw-map-wrap>a:hover{text-decoration:underline}
 @media(max-width:640px){.imgw-map-wrap iframe{height:520px}}
+
+
+/* Nowe panele: wykresy, porównanie, weekend, opady i astronomia */
+.tab-bar{flex-wrap:wrap;overflow:visible}
+.chart-card,.feature-page{margin-top:18px;position:relative;z-index:1}
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;color:#9db5cf;font-size:10px;margin:4px 0 14px}
+.chart-legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#67c5ff;margin-right:7px}
+.chart-legend span+span:before{background:#55d6b0}
+.temp-chart-bars{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:8px;align-items:end;min-height:190px;padding:12px 8px 4px;border-bottom:1px solid #9bc8ed24}
+.temp-chart-point{height:170px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px;min-width:0}
+.temp-chart-point>b{font-size:11px;color:#eaf5ff}
+.temp-chart-point>i{display:block;width:min(24px,70%);min-height:4px;max-height:100px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,#78caff,#3d82c5);box-shadow:0 4px 14px #3b9ce633}
+.temp-chart-point>small{font-size:9px;color:#91aac3}
+.temp-chart-point>em{font-size:9px;color:#72d9bd;font-style:normal}
+.comparison-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.comparison-city{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:15px;border:1px solid #a8d5ff20;border-radius:13px;background:#ffffff08}
+.comparison-city>div{display:flex;flex-direction:column;gap:2px}
+.comparison-city>div b{font-size:13px}.comparison-city small,.comparison-city span{font-size:10px;color:#9db5cf}
+.comparison-city>strong{font-size:27px;color:#f3f8ff}
+.comparison-city>small{display:flex;align-items:center;gap:5px}
+.comparison-city>button{margin-top:3px;padding:7px 10px;border:1px solid #8bcaff35;border-radius:8px;background:#4b91c522;color:#bfe3ff;font-size:10px;cursor:pointer}
+.weekend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.weekend-day{display:flex;flex-direction:column;align-items:flex-start;gap:11px;padding:18px;border:1px solid #a8d5ff24;border-radius:14px;background:#ffffff08}
+.weekend-day>span{font-size:10px;letter-spacing:1px;color:#9fc7e8}
+.weekend-day>b{font-size:13px}.weekend-day>strong{font-size:27px}.weekend-day>strong small{font-size:15px;color:#9db5cf}
+.weekend-day>div{display:flex;align-items:center;gap:7px;color:#b8cce0;font-size:11px}
+.rain-timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}
+.rain-time{display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid #70caff24;border-radius:11px;background:#ffffff08}
+.rain-time>b{font-size:10px;color:#9db5cf;text-transform:capitalize}.rain-time>strong{font-size:18px;color:#f1f7ff}
+.rain-time>span{font-size:11px;color:#76d9be}.rain-time>small{font-size:10px;color:#a8bfd7}
+.sun-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sun-grid article{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:17px;border:1px solid #a8d5ff20;border-radius:13px;background:#ffffff08}
+.sun-grid article>svg{width:21px;height:21px;color:#8ccfff}
+.sun-grid article>span{font-size:10px;color:#9db5cf}
+.sun-grid article>strong{font-size:20px;color:#f0f7ff}
+@media(max-width:650px){
+ .tab-bar{gap:5px;justify-content:flex-start}
+ .tab-bar button{font-size:10px;padding:9px 10px}
+ .temp-chart-bars{gap:3px;min-height:165px}
+ .temp-chart-point{height:150px;gap:5px}
+ .temp-chart-point>b{font-size:9px}
+ .temp-chart-point>small,.temp-chart-point>em{font-size:8px}
+ .weekend-grid{grid-template-columns:1fr}
+ .sun-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
