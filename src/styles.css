@@ -55,3 +55,13 @@ section[id]{scroll-margin-top:82px}
 
 /* Kafelki metryk bez osobnego tła */
 .metric{background:transparent!important;border-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+
+.imgw-map-wrap{margin:16px 0 20px;border:1px solid #8fcaff24;border-radius:14px;overflow:hidden;background:#081a2c}
+.imgw-map-heading{display:flex;flex-direction:column;gap:4px;padding:13px 15px;border-bottom:1px solid #8fcaff20}
+.imgw-map-heading b{font-size:12px;color:#eaf4ff}
+.imgw-map-heading span{font-size:10px;color:#91aac3}
+.imgw-map-wrap iframe{display:block;width:100%;height:clamp(430px,65vh,720px);border:0;background:#e8edf2}
+.imgw-map-wrap>a{display:block;padding:11px 15px;color:#91ceff;font-size:11px;text-decoration:none;border-top:1px solid #8fcaff20}
+.imgw-map-wrap>a:hover{text-decoration:underline}
+@media(max-width:640px){.imgw-map-wrap iframe{height:520px}}
