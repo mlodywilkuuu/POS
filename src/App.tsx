@@ -233,9 +233,9 @@ export default function App() {
 
     {error && <div className="error-banner"><AlertTriangle size={17}/>{error} <button onClick={refresh}>Spróbuj ponownie</button></div>}
 
-    {activeSection === "favorites" && <section className="glass tools-card" id="favorites"><div className="section-head"><div><span className="eyebrow">SZYBKI DOSTĘP</span><h2>Ulubione miejscowości</h2></div><button className="tool-button" onClick={toggleFavorite}>{favorites.some(p => p.latitude === place.latitude && p.longitude === place.longitude) ? 'Usuń z ulubionych' : 'Dodaj ' + place.name}</button></div><div className="favorite-list">{favorites.length ? favorites.map((p,i)=><button key={p.latitude + '-' + p.longitude + i} onClick={() => selectPlace(p)}><MapPin size={14}/>{p.name}{p.admin1 ? ', ' + p.admin1 : ''}</button>) : <span className="source-note">Dodaj aktualną miejscowość, aby szybko wracać do jej prognozy.</span>}</div></section>
+    {activeSection === "favorites" && <section className="glass tools-card" id="favorites"><div className="section-head"><div><span className="eyebrow">SZYBKI DOSTĘP</span><h2>Ulubione miejscowości</h2></div><button className="tool-button" onClick={toggleFavorite}>{favorites.some(p => p.latitude === place.latitude && p.longitude === place.longitude) ? 'Usuń z ulubionych' : 'Dodaj ' + place.name}</button></div><div className="favorite-list">{favorites.length ? favorites.map((p,i)=><button key={p.latitude + '-' + p.longitude + i} onClick={() => selectPlace(p)}><MapPin size={14}/>{p.name}{p.admin1 ? ', ' + p.admin1 : ''}</button>) : <span className="source-note">Dodaj aktualną miejscowość, aby szybko wracać do jej prognozy.</span>}</div></section>}
 
-    <section className="hero-grid">
+    {activeSection === "forecast" && <><section className="hero-grid">
       <div className="glass hero-card">
         <div className="hero-top"><div><span className="eyebrow">TERAZ W {place.name.toLocaleUpperCase('pl-PL')}</span><h1>{place.name}</h1><p>{current ? weatherText(current.weather_code) : 'Ładowanie warunków...'}</p></div><div className="hero-weather"><WeatherIcon code={current?.weather_code ?? 2} size={76}/></div></div>
         <div className="temperature">{loading ? '—' : fmt(current?.temperature_2m)}<span>°</span></div>
