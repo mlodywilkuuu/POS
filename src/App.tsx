@@ -16,6 +16,19 @@ const WeatherIcon = ({ code, size = 22 }: { code: number; size?: number }) => {
 const dayName = (date: string, long = false) => new Intl.DateTimeFormat('pl-PL', { weekday: long ? 'long' : 'short', day: 'numeric', month: 'short' }).format(new Date(date + 'T12:00:00'));
 const fmt = (n: number | null | undefined) => n == null ? '—' : Math.round(n).toString();
 const pct = (n: number | null | undefined) => n == null ? '—' : Math.round(n) + '%';
+const moonPhase = (date: Date) => {
+  const knownNewMoon = Date.UTC(2000,0,6,18,14);
+  const cycle = 29.530588853;
+  const age = (((date.getTime()-knownNewMoon)/86400000)%cycle+cycle)%cycle;
+  if (age < 1.85 || age > 27.68) return 'Nów';
+  if (age < 7.38) return 'Sierp przybywający';
+  if (age < 9.23) return 'Pierwsza kwadra';
+  if (age < 14.76) return 'Garbaty przybywający';
+  if (age < 16.61) return 'Pełnia';
+  if (age < 22.15) return 'Garbaty ubywający';
+  if (age < 24) return 'Ostatnia kwadra';
+  return 'Sierp ubywający';
+};
 
 export default function App() {
   const [place, setPlace] = useState<Place>(DEFAULT_PLACE);
