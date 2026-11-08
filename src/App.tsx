@@ -32,6 +32,9 @@ export default function App() {
   const [error, setError] = useState('');
   const [updated, setUpdated] = useState<Date | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [warnings, setWarnings] = useState<any[]>([]);
+  const [warningsLoading, setWarningsLoading] = useState(true);
+  const [warningsError, setWarningsError] = useState('');
 
   const loadWeather = useCallback(async (target: Place, quiet = false) => {
     if (!quiet) setLoading(true);
@@ -62,6 +65,33 @@ export default function App() {
       setLoading(false);
       setRefreshing(false);
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadWarnings = async () => {
+      try {
+        const response = await fetch('https://danepubliczne.imgw.pl/api/data/warningsmeteo');
+        if (!response.ok) throw new Error('Nie udało się pobrać ostrzeżeń IMGW.');
+        const data = await response.json();
+        if (cancelled) return;
+        const now = Date.now();
+        const active = (Array.isArray(data) ? data : []).filter((item: any) => {
+          if (!item.obowiazuje_do) return true;
+          const end = new Date(String(item.obowiazuje_do).replace(' ', 'T')).getTime();
+          return Number.isNaN(end) || end >= now;
+        }).sort((a: any, b: any) => Number(b.stopien || 0) - Number(a.stopien || 0));
+        setWarnings(active);
+        setWarningsError('');
+      } catch (e) {
+        if (!cancelled) setWarningsError(e instanceof Error ? e.message : 'Ostrzeżenia IMGW są chwilowo niedostępne.');
+      } finally {
+        if (!cancelled) setWarningsLoading(false);
+      }
+    };
+    loadWarnings();
+    const interval = window.setInterval(loadWarnings, 10 * 60 * 1000);
+    return () => { cancelled = true; window.clearInterval(interval); };
   }, []);
 
   useEffect(() => { loadWeather(place); }, [place, loadWeather]);
@@ -182,6 +212,25 @@ export default function App() {
     </header>
 
     <section className="location-line"><div><span className="live-dot"/><span>DANE METEOROLOGICZNE NA ŻYWO</span><span className="muted">/</span><MapPin size={14}/><b>{place.name}{place.admin1 ? ', ' + place.admin1 : ''}</b></div><span className="updated">Aktualizacja: {updated ? updated.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit'}) : '—'} · automatycznie co 15 min</span></section>
+
+    <section className="glass alerts-card">
+      <div className="section-head"><div><span className="eyebrow">OFICJALNE KOMUNIKATY</span><h2><AlertTriangle size={19}/> Ostrzeżenia IMGW</h2></div><a className="source-link" href="https://meteo.imgw.pl/" target="_blank" rel="noreferrer">Mapa ostrzeżeń IMGW ↗</a></div>
+      <p className="alerts-intro">Aktywne ostrzeżenia meteorologiczne publikowane dla obszarów Polski. Sprawdź na mapie IMGW, czy obejmują Twój powiat.</p>
+      {warningsLoading ? <div className="empty-state">Pobieram oficjalne ostrzeżenia…</div> :
+        warningsError ? <div className="empty-state">{warningsError} <a href="https://meteo.imgw.pl/" target="_blank" rel="noreferrer">Otwórz IMGW</a></div> :
+        warnings.length === 0 ? <div className="no-alerts"><span className="live-dot"/> Brak aktywnych ostrzeżeń meteorologicznych w pobranym wykazie IMGW.</div> :
+        <div className="alerts-list">{warnings.slice(0, 5).map((w: any) => <article className="alert-item" key={w.id || w.obowiazuje_od + w.nazwa_zdarzenia}>
+          <div className={'alert-level level-' + String(w.stopien || '1')}><AlertTriangle size={16}/><b>STOPIEŃ {w.stopien || '—'}</b></div>
+          <div className="alert-content"><b>{w.nazwa_zdarzenia || 'Ostrzeżenie meteorologiczne'}</b><p>{w.tresc || 'Szczegóły dostępne w komunikacie IMGW.'}</p><small>Obowiązuje: {w.obowiazuje_od || '—'} – {w.obowiazuje_do || '—'}{w.prawdopodobienstwo ? ' · Prawdopodobieństwo: ' + w.prawdopodobienstwo + '%' : ''}</small></div>
+        </article>)}</div>}
+      <div className="source-note">Źródło: IMGW-PIB · aktualizacja automatyczna co 10 minut · lista ogólnopolska, nie zastępuje sprawdzenia obszaru na mapie IMGW.</div>
+    </section>
+
+    <section className="glass radar-card">
+      <div className="section-head"><div><span className="eyebrow">OBRAZ OPADÓW</span><h2>Radar opadów</h2></div><span className="subtle-label">Centrum: {place.name}</span></div>
+      <div className="radar-frame"><iframe title={'Radar opadów dla ' + place.name} src={'https://www.rainviewer.com/map.html?loc=' + place.latitude + ',' + place.longitude + ',6&layer=radar&sm=1&sn=1&hu=0'} loading="lazy" referrerPolicy="no-referrer" allowFullScreen /></div>
+      <div className="source-note">Radar pokazuje dostępne obrazy historyczne opadów; nie jest prognozą, a zasięg i aktualność zależą od dostawcy danych. Źródło: RainViewer.</div>
+    </section>
 
     {error && <div className="error-banner"><AlertTriangle size={17}/>{error} <button onClick={refresh}>Spróbuj ponownie</button></div>}
 
