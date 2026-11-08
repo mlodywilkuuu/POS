@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, MapPin, RefreshCw, CloudSun, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets, Gauge, Sparkles, CalendarDays, ThermometerSun, Sunrise, Sunset, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Search, MapPin, RefreshCw, CloudSun, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets, Gauge, Sparkles, CalendarDays, ThermometerSun, Sunrise, Sunset, AlertTriangle, ChevronDown, Moon, Umbrella, Building2 } from 'lucide-react';
 
 type Place = { name: string; admin1?: string; latitude: number; longitude: number; country?: string };
 type Forecast = { current?: any; daily?: any; daily_units?: any; hourly?: any; timezone?: string; current_units?: any };
@@ -38,6 +38,8 @@ export default function App() {
   const [warnings, setWarnings] = useState<any[]>([]);
   const [warningsLoading, setWarningsLoading] = useState(true);
   const [warningsError, setWarningsError] = useState('');
+  const [comparison, setComparison] = useState<any[]>([]);
+  const [comparisonLoading, setComparisonLoading] = useState(false);
 
   const loadWeather = useCallback(async (target: Place, quiet = false) => {
     if (!quiet) setLoading(true);
@@ -47,7 +49,7 @@ export default function App() {
       const params = new URLSearchParams({
         latitude: String(target.latitude), longitude: String(target.longitude),
         current: 'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,pressure_msl',
-        daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,sunrise,sunset',
+        daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max',
         hourly: 'temperature_2m,precipitation_probability,precipitation,wind_speed_10m',
         forecast_days: '16', timezone: 'auto'
       });
@@ -177,6 +179,27 @@ export default function App() {
   const toggleFavorite = () => saveFavorites(favorites.some(p => p.latitude === place.latitude && p.longitude === place.longitude) ? favorites.filter(p => p.latitude !== place.latitude || p.longitude !== place.longitude) : [...favorites, place].slice(-8));
   const enableNotifications = async () => { if (!('Notification' in window)) return; const permission = await Notification.requestPermission(); setNotificationsEnabled(permission === 'granted'); if (permission === 'granted' && warnings.length) new Notification('PogodaPL – ostrzeżenia IMGW', { body: warnings[0].nazwa_zdarzenia || 'Aktywne ostrzeżenie pogodowe. Sprawdź mapę IMGW.' }); };
   const goTo = (id: string) => setActiveSection(id);
+  const compareCities: Place[] = [
+    {name:'Warszawa',admin1:'mazowieckie',latitude:52.2297,longitude:21.0122},
+    {name:'Kraków',admin1:'małopolskie',latitude:50.0647,longitude:19.945},
+    {name:'Gdańsk',admin1:'pomorskie',latitude:54.352,longitude:18.6466},
+    {name:'Białystok',admin1:'podlaskie',latitude:53.1325,longitude:23.1688},
+    {name:'Wrocław',admin1:'dolnośląskie',latitude:51.1079,longitude:17.0385}
+  ];
+  useEffect(() => {
+    if (activeSection !== 'compare') return;
+    let cancelled = false;
+    setComparisonLoading(true);
+    Promise.all(compareCities.map(async city => {
+      const params = new URLSearchParams({latitude:String(city.latitude),longitude:String(city.longitude),current:'temperature_2m,weather_code',daily:'temperature_2m_max,temperature_2m_min,precipitation_probability_max',forecast_days:'1',timezone:'auto'});
+      const response = await fetch('https://api.open-meteo.com/v1/forecast?' + params.toString());
+      if (!response.ok) throw new Error('Nie udało się pobrać porównania miast.');
+      return {city,...await response.json()};
+    })).then(rows => { if (!cancelled) setComparison(rows); })
+      .catch(() => { if (!cancelled) setComparison([]); })
+      .finally(() => { if (!cancelled) setComparisonLoading(false); });
+    return () => { cancelled = true; };
+  }, [activeSection]);
   const mapLayers = [{id:'rain',label:'Deszcz'}, {id:'snowAccu',label:'Śnieg'}, {id:'ptype',label:'Typ opadu'}, {id:'radar',label:'Radar'}, {id:'wind',label:'Wiatr'}, {id:'temp',label:'Temperatura'}, {id:'clouds',label:'Chmury'}];
 
   return <main className="app-shell">
@@ -207,7 +230,7 @@ export default function App() {
       </div>
       <button className="refresh-btn" onClick={refresh} aria-label="Odśwież dane"><RefreshCw size={17} className={refreshing ? 'spin' : ''}/><span>Odśwież</span></button>
     </header>
-    <nav className="menu-bar tab-bar" aria-label="Zakładki główne"><button className={activeSection==='forecast'?'active':''} onClick={() => goTo('forecast')}>Prognoza</button><button className={activeSection==='alerts'?'active':''} onClick={() => goTo('alerts')}>Ostrzeżenia</button><button className={activeSection==='radar'?'active':''} onClick={() => goTo('radar')}>Mapa pogody</button><button className={activeSection==='air'?'active':''} onClick={() => goTo('air')}>Powietrze i UV</button><button className={activeSection==='favorites'?'active':''} onClick={() => goTo('favorites')}>Ulubione</button></nav>
+    <nav className="menu-bar tab-bar" aria-label="Zakładki główne"><button className={activeSection==='forecast'?'active':''} onClick={() => goTo('forecast')}>Prognoza</button><button className={activeSection==='alerts'?'active':''} onClick={() => goTo('alerts')}>Ostrzeżenia</button><button className={activeSection==='radar'?'active':''} onClick={() => goTo('radar')}>Mapa pogody</button><button className={activeSection==='air'?'active':''} onClick={() => goTo('air')}>Powietrze i UV</button><button className={activeSection==='favorites'?'active':''} onClick={() => goTo('favorites')}>Ulubione</button><button className={activeSection==='compare'?'active':''} onClick={() => goTo('compare')}>Porównanie</button><button className={activeSection==='weekend'?'active':''} onClick={() => goTo('weekend')}>Weekend</button><button className={activeSection==='rain'?'active':''} onClick={() => goTo('rain')}>Kiedy deszcz?</button><button className={activeSection==='sun'?'active':''} onClick={() => goTo('sun')}>Słońce</button></nav>
 
     <section className="location-line"><div><span className="live-dot"/><span>DANE METEOROLOGICZNE NA ŻYWO</span><span className="muted">/</span><MapPin size={14}/><b>{place.name}{place.admin1 ? ', ' + place.admin1 : ''}</b></div><span className="updated">Aktualizacja: {updated ? updated.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit'}) : '—'} · automatycznie co 15 min</span></section>
 
