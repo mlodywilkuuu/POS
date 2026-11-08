@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search, MapPin, RefreshCw, CloudSun, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets, Gauge, Sparkles, CalendarDays, ThermometerSun, Sunrise, Sunset, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Search, MapPin, RefreshCw, CloudSun, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets, Sparkles, CalendarDays, ThermometerSun, Sunrise, Sunset, AlertTriangle, ChevronDown } from 'lucide-react';
 
 type Place = { name: string; admin1?: string; latitude: number; longitude: number; country?: string };
 type Forecast = { current?: any; daily?: any; daily_units?: any; hourly?: any; timezone?: string; current_units?: any };
@@ -242,14 +242,7 @@ export default function App() {
         <div className="feels">Odczuwalna <b>{fmt(current?.apparent_temperature)}°C</b><span className="vertical-line"/> Maks. dziś <b>{fmt(daily?.temperature_2m_max?.[0])}°</b><span className="vertical-line"/> Min. <b>{fmt(daily?.temperature_2m_min?.[0])}°</b></div>
         <div className="hero-footer"><div><Sunrise size={17}/><span>Wschód <b>{daily?.sunrise?.[0]?.slice(11,16) || '—'}</b></span></div><div><Sunset size={17}/><span>Zachód <b>{daily?.sunset?.[0]?.slice(11,16) || '—'}</b></span></div><div><CalendarDays size={17}/><span>{new Date().toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})}</span></div></div>
       </div>
-      <div className="metric-grid">
-        <div className="glass metric"><div className="metric-label"><Droplets/> WILGOTNOŚĆ</div><strong>{fmt(current?.relative_humidity_2m)}<small>%</small></strong><span>Wilgotność względna</span></div>
-        <div className="glass metric"><div className="metric-label"><Wind/> WIATR</div><strong>{fmt(current?.wind_speed_10m)}<small> km/h</small></strong><span>Prędkość przy ziemi</span></div>
-        <div className="glass metric"><div className="metric-label"><Gauge/> CIŚNIENIE</div><strong>{fmt(current?.pressure_msl)}<small> hPa</small></strong><span>Na poziomie morza</span></div>
-        <div className="glass metric"><div className="metric-label"><CloudRain/> OPAD TERAZ</div><strong>{current?.precipitation ?? '—'}<small> mm</small></strong><span>Aktualny opad</span></div>
-        <div className="glass metric"><div className="metric-label"><Wind/> JAKOŚĆ POWIETRZA</div><strong>{air?.european_aqi ?? '—'}<small> AQI</small></strong><span>{air?.pm2_5 != null ? 'PM2.5: ' + fmt(air.pm2_5) + ' µg/m³' : 'Europejski indeks jakości powietrza'}</span></div>
-        <div className="glass metric"><div className="metric-label"><Sun/> INDEKS UV</div><strong>{air?.uv_index == null ? '—' : fmt(air.uv_index)}</strong><span>{air?.uv_index >= 8 ? 'Bardzo wysoki – chroń skórę' : air?.uv_index >= 6 ? 'Wysoki – zalecana ochrona' : air?.uv_index >= 3 ? 'Umiarkowany' : 'Niski'}</span></div>
-      </div>
+
     </section>
 
     <section className="glass ai-card"><div className="ai-icon"><Sparkles size={21}/></div><div className="ai-copy"><div className="ai-heading">PogodaAI <span>ANALIZA AUTOMATYCZNA</span></div><p>{loading ? 'AI analizuje najnowsze dane...' : ai}</p><small>Analiza regułowa na podstawie aktualnej prognozy. To wskazówka, nie ostrzeżenie IMGW.</small></div><div className="ai-pulse"><i/><i/><i/></div></section>
@@ -259,7 +252,7 @@ export default function App() {
       <div className="daily-list">{(daily?.time || []).slice(0,visibleDays).map((date: string,i: number)=><div className="day-row" key={date}><div className="day-name"><b>{i===0?'Dziś':dayName(date).split(',')[0]}</b><small>{dayName(date)}</small></div><div className="day-icon"><WeatherIcon code={daily.weather_code[i]}/><span>{weatherText(daily.weather_code[i])}</span></div><div className="rain-chance"><Droplets size={14}/>{pct(daily.precipitation_probability_max?.[i])}</div><div className="day-temps"><b>{fmt(daily.temperature_2m_max?.[i])}°</b><span>{fmt(daily.temperature_2m_min?.[i])}°</span></div><div className="wind-mini"><Wind size={14}/>{fmt(daily.wind_speed_10m_max?.[i])} km/h</div></div>)}</div>
     </section>
 
-    {tab !== 'month' && <section className="glass hourly-card" id="hourly"><div className="section-head"><div><span className="eyebrow">SZCZEGÓŁOWO</span><h2>Najbliższe godziny</h2></div><span className="subtle-label">Prognoza godzinowa</span></div><div className="hourly-scroll">{hourRows.map((h:any,i:number)=><div className="hour-item" key={h.time+i}><span>{i===0?'Teraz':h.time}</span><WeatherIcon code={h.code} size={22}/><b>{fmt(h.temp)}°</b><small><Droplets size={12}/>{pct(h.rain)}</small></div>)}</div></section>}
+    <section className="glass hourly-card" id="hourly"><div className="section-head"><div><span className="eyebrow">SZCZEGÓŁOWO</span><h2>Najbliższe godziny</h2></div><span className="subtle-label">Prognoza godzinowa</span></div><div className="hourly-scroll">{hourRows.map((h:any,i:number)=><div className="hour-item" key={h.time+i}><span>{i===0?'Teraz':h.time}</span><WeatherIcon code={h.code} size={22}/><b>{fmt(h.temp)}°</b><small><Droplets size={12}/>{pct(h.rain)}</small></div>)}</div></section>
 
     <section className="glass tools-card notification-card"><div><b>Powiadomienia o ostrzeżeniach</b><span>Włącz powiadomienia przeglądarki i wyświetl aktualne ostrzeżenie. Strona musi być otwarta, aby działała.</span></div><button className="tool-button" onClick={enableNotifications}>{notificationsEnabled ? 'Powiadomienia włączone' : 'Włącz powiadomienia'}</button></section>
 
