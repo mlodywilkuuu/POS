@@ -243,6 +243,14 @@ export default function App() {
         <div className="hero-footer"><div><Sunrise size={17}/><span>Wschód <b>{daily?.sunrise?.[0]?.slice(11,16) || '—'}</b></span></div><div><Sunset size={17}/><span>Zachód <b>{daily?.sunset?.[0]?.slice(11,16) || '—'}</b></span></div><div><CalendarDays size={17}/><span>{new Date().toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})}</span></div></div>
       </div>
 
+      <div className="metric-grid">
+        <div className="glass metric"><div className="metric-label"><Droplets/> WILGOTNOŚĆ</div><strong>{fmt(current?.relative_humidity_2m)}<small>%</small></strong><span>Wilgotność względna</span></div>
+        <div className="glass metric"><div className="metric-label"><Wind/> WIATR</div><strong>{fmt(current?.wind_speed_10m)}<small> km/h</small></strong><span>Prędkość przy ziemi</span></div>
+        <div className="glass metric"><div className="metric-label"><Gauge/> CIŚNIENIE</div><strong>{fmt(current?.pressure_msl)}<small> hPa</small></strong><span>Na poziomie morza</span></div>
+        <div className="glass metric"><div className="metric-label"><CloudRain/> OPAD TERAZ</div><strong>{current?.precipitation ?? '—'}<small> mm</small></strong><span>Aktualny opad</span></div>
+        <div className="glass metric"><div className="metric-label"><Wind/> JAKOŚĆ POWIETRZA</div><strong>{air?.european_aqi ?? '—'}<small> AQI</small></strong><span>{air?.pm2_5 != null ? 'PM2.5: ' + fmt(air.pm2_5) + ' µg/m³' : 'Europejski indeks jakości powietrza'}</span></div>
+        <div className="glass metric"><div className="metric-label"><Sun/> INDEKS UV</div><strong>{air?.uv_index == null ? '—' : fmt(air.uv_index)}</strong><span>{air?.uv_index >= 8 ? 'Bardzo wysoki – chroń skórę' : air?.uv_index >= 6 ? 'Wysoki – zalecana ochrona' : air?.uv_index >= 3 ? 'Umiarkowany' : 'Niski'}</span></div>
+      </div>
     </section>
 
     <section className="glass ai-card"><div className="ai-icon"><Sparkles size={21}/></div><div className="ai-copy"><div className="ai-heading">PogodaAI <span>ANALIZA AUTOMATYCZNA</span></div><p>{loading ? 'AI analizuje najnowsze dane...' : ai}</p><small>Analiza regułowa na podstawie aktualnej prognozy. To wskazówka, nie ostrzeżenie IMGW.</small></div><div className="ai-pulse"><i/><i/><i/></div></section>
