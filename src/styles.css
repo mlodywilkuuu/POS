@@ -52,3 +52,6 @@ section[id]{scroll-margin-top:82px}
 .map-layer-tabs button:hover{background:#5ba9e533;color:#fff}
 #air{scroll-margin-top:90px}
 @media(max-width:760px){.tab-bar{top:4px;flex-wrap:nowrap}.tab-bar>button{min-width:auto;flex:0 0 auto;padding:10px 12px;font-size:10px}.map-layer-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:5px}.map-layer-tabs button{flex:0 0 auto}}
+
+/* Kafelki metryk bez osobnego tła */
+.metric{background:transparent!important;border-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
