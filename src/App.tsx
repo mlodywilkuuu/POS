@@ -23,6 +23,8 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Place[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState('');
   const [tab, setTab] = useState<'7' | '14' | 'month'>('7');
   const [forecast, setForecast] = useState<Forecast | null>(null);
   const [seasonal, setSeasonal] = useState<Seasonal | null>(null);
@@ -69,17 +71,45 @@ export default function App() {
   }, [place, loadWeather]);
 
   useEffect(() => {
-    if (query.trim().length < 2) { setSuggestions([]); return; }
+    const term = query.trim();
+    let cancelled = false;
+    if (term.length < 2) {
+      setSuggestions([]);
+      setSearchLoading(false);
+      setSearchError('');
+      return;
+    }
+
+    setShowSuggestions(true);
+    setSuggestions([]);
+    setSearchError('');
+    setSearchLoading(true);
     const timer = window.setTimeout(async () => {
       try {
-        const p = new URLSearchParams({ name: query, count: '7', language: 'pl', format: 'json', countryCode: 'PL' });
-        const r = await fetch('https://geocoding-api.open-meteo.com/v1/search?' + p);
-        const data = await r.json();
-        setSuggestions((data.results || []).filter((x: any) => x.country_code === 'PL').map((x: any) => ({ name: x.name, admin1: x.admin1, latitude: x.latitude, longitude: x.longitude, country: 'Polska' })));
-        setShowSuggestions(true);
-      } catch { setSuggestions([]); }
-    }, 300);
-    return () => window.clearTimeout(timer);
+        const p = new URLSearchParams({ name: term, count: '10', language: 'pl', format: 'json', countryCode: 'PL' });
+        const response = await fetch('https://geocoding-api.open-meteo.com/v1/search?' + p.toString());
+        if (!response.ok) throw new Error('Wyszukiwarka chwilowo nie odpowiada.');
+        const data = await response.json();
+        if (cancelled) return;
+        const results = (data.results || [])
+          .filter((x: any) => x.country_code === 'PL')
+          .map((x: any) => ({ name: x.name, admin1: x.admin1, latitude: x.latitude, longitude: x.longitude, country: 'Polska' }));
+        setSuggestions(results);
+        setSearchError(results.length ? '' : 'Nie znaleziono miejscowości. Spróbuj wpisać pełniejszą nazwę.');
+      } catch (e) {
+        if (!cancelled) {
+          setSuggestions([]);
+          setSearchError(e instanceof Error ? e.message : 'Nie udało się wyszukać miasta.');
+        }
+      } finally {
+        if (!cancelled) setSearchLoading(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [query]);
 
   const current = forecast?.current;
@@ -127,8 +157,26 @@ export default function App() {
     <header className="topbar">
       <a className="brand" href="#"><span className="brand-mark"><CloudSun size={23}/></span><span>Pogoda<span className="brand-accent">PL</span><small>POGODA W POLSCE • NA ŻYWO</small></span></a>
       <div className="search-wrap">
-        <Search size={18}/><input value={query} onChange={e => setQuery(e.target.value)} onFocus={() => suggestions.length && setShowSuggestions(true)} onKeyDown={e => { if (e.key === 'Enter' && suggestions[0]) selectPlace(suggestions[0]); }} placeholder="Wyszukaj miasto w Polsce..." />
-        {showSuggestions && suggestions.length > 0 && <div className="suggestions">{suggestions.map((s,i) => <button key={s.name + i} onClick={() => selectPlace(s)}><MapPin size={15}/><span>{s.name}<small>{s.admin1 || 'Polska'}</small></span></button>)}</div>}
+        <Search size={18}/>
+        <input
+          value={query}
+          aria-label="Wyszukaj miasto w Polsce"
+          aria-autocomplete="list"
+          aria-expanded={showSuggestions}
+          onChange={e => { setQuery(e.target.value); setShowSuggestions(true); }}
+          onFocus={() => { if (query.trim().length >= 2) setShowSuggestions(true); }}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && suggestions[0]) { e.preventDefault(); selectPlace(suggestions[0]); }
+            if (e.key === 'Escape') setShowSuggestions(false);
+          }}
+          placeholder="Wyszukaj miasto w Polsce..."
+        />
+        {query && <button className="search-clear" aria-label="Wyczyść wyszukiwanie" onClick={() => { setQuery(''); setSuggestions([]); setShowSuggestions(false); }}>×</button>}
+        {showSuggestions && query.trim().length >= 2 && <div className="suggestions">
+          {searchLoading ? <div className="suggestions-message">Szukam miejscowości…</div> :
+            suggestions.length > 0 ? suggestions.map((s,i) => <button key={s.name + s.latitude + i} onClick={() => selectPlace(s)}><MapPin size={15}/><span>{s.name}<small>{s.admin1 || 'Polska'}</small></span></button>) :
+            <div className="suggestions-message">{searchError || 'Brak wyników.'}</div>}
+        </div>}
       </div>
       <button className="refresh-btn" onClick={refresh} aria-label="Odśwież dane"><RefreshCw size={17} className={refreshing ? 'spin' : ''}/><span>Odśwież</span></button>
     </header>
